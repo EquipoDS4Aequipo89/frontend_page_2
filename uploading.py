@@ -38,6 +38,9 @@ app.layout = html.Div([ # this code section taken from Dash docs https://dash.pl
         multiple=True
     ),
     html.Div(id='output-div'),
+    html.Div(id='output-div1'),
+    html.Div(id='output-div2'),
+    html.Div(id='output-div3'),
     html.Div(id='output-datatable'),
 ])
 
@@ -71,9 +74,11 @@ def parse_contents(contents, filename, date):
         #              options=[{'label':x, 'value':x} for x in df.columns]),
         html.Button(id="submit-button", children="Create Graph"),
 
+        # Relevant variables
         dcc.Store(id = 'orden-data', data = df.ORDEN),
         dcc.Store(id = 'altitud-data', data = df.ALTITUD),
-    
+        # dcc.Store(id = 'temperatura-data', data = df.REGIMEN_TEMPERATURA),
+        # dcc.Store(id = 'humedad-data', data = df.REGIMEN_HUMEDAD),    
 
         html.Hr(),
 
@@ -108,6 +113,9 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
 
 
 @app.callback(Output('output-div', 'children'),
+              Output('output-div1', 'children'),
+              Output('output-div2', 'children'),
+              Output('output-div3', 'children'),
               Input('submit-button','n_clicks'),
               State('stored-data','data'),
               State('orden-data','data'),
@@ -116,15 +124,24 @@ def make_graphs(n, data, orden, altitud):
     
     orden = pd.Series(orden)
     altitud = pd.Series(altitud)
-    print(orden)
-    print(altitud)
+
     if n is None:
         return dash.no_update
     else:
 
         pie_fig = px.pie(data, values=orden.value_counts(), names=orden.value_counts().index)
+        box_fig = px.box(data, x = orden, y = altitud)
+        text = html.Div(children = [html.H1('70%', style = {'text-align': 'center'}), 
+                                    html.H5('accuracy', style = {'text-align': 'center'})])
+        heat_map = px.imshow([[1, 20, 30],
+                 [20, 1, 60],
+                 [30, 60, 1]])
 
-        return dcc.Graph(figure=pie_fig)
+        fig1 = dcc.Graph(figure=pie_fig)
+        fig2 = dcc.Graph(figure = box_fig) 
+        fig3 = dcc.Graph(figure = heat_map)
+
+        return fig1, fig2, text, fig3
 
 
 
