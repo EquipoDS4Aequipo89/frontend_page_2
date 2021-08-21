@@ -17,7 +17,13 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets,
                 suppress_callback_exceptions=True)
 
-app.layout = html.Div([ # this code section taken from Dash docs https://dash.plotly.com/dash-core-components/upload
+app.layout = html.Div([ 
+    html.Div(className = 'header',
+    children = [html.H1(children = "Taxonomic Classification of Soil Profiles", 
+    className = 'title')]
+            ),
+    
+    # this code section taken from Dash docs https://dash.plotly.com/dash-core-components/upload
     dcc.Upload(
         id='upload-data',
         children=html.Div([
@@ -37,10 +43,11 @@ app.layout = html.Div([ # this code section taken from Dash docs https://dash.pl
         # Allow multiple files to be uploaded
         multiple=True
     ),
-    html.Div(id='output-div'),
-    html.Div(id='output-div1'),
-    html.Div(id='output-div2'),
-    html.Div(id='output-div3'),
+    html.Div(className = 'plots',
+        children = [html.Div(id='output-div'),
+        html.Div(id='output-div1'),
+        html.Div(id='output-div2'),
+        html.Div(id='output-div3')]),
     html.Div(id='output-datatable'),
 ])
 
