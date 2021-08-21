@@ -63,13 +63,18 @@ def parse_contents(contents, filename, date):
     return html.Div([
         html.H5(filename),
         html.H6(datetime.datetime.fromtimestamp(date)),
-        html.P("Inset X axis data"),
-        dcc.Dropdown(id='xaxis-data',
-                     options=[{'label':x, 'value':x} for x in df.columns]),
-        html.P("Inset Y axis data"),
-        dcc.Dropdown(id='yaxis-data',
-                     options=[{'label':x, 'value':x} for x in df.columns]),
+        # html.P("Inset X axis data"),
+        # dcc.Dropdown(id='xaxis-data',
+        #              options=[{'label':x, 'value':x} for x in df.columns]),
+        # html.P("Inset Y axis data"),
+        # dcc.Dropdown(id='yaxis-data',
+        #              options=[{'label':x, 'value':x} for x in df.columns]),
         html.Button(id="submit-button", children="Create Graph"),
+
+        dcc.Store(id = 'orden-data', data = df.ORDEN),
+        dcc.Store(id = 'altitud-data', data = df.ALTITUD),
+    
+
         html.Hr(),
 
         dash_table.DataTable(
@@ -105,15 +110,21 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
 @app.callback(Output('output-div', 'children'),
               Input('submit-button','n_clicks'),
               State('stored-data','data'),
-              State('xaxis-data','value'),
-              State('yaxis-data', 'value'))
-def make_graphs(n, data, x_data, y_data):
+              State('orden-data','data'),
+              State('altitud-data', 'data'))
+def make_graphs(n, data, orden, altitud):
+    
+    orden = pd.Series(orden)
+    altitud = pd.Series(altitud)
+    print(orden)
+    print(altitud)
     if n is None:
         return dash.no_update
     else:
-        bar_fig = px.bar(data, x=x_data, y=y_data)
-        # print(data)
-        return dcc.Graph(figure=bar_fig)
+
+        pie_fig = px.pie(data, values=orden.value_counts(), names=orden.value_counts().index)
+
+        return dcc.Graph(figure=pie_fig)
 
 
 
